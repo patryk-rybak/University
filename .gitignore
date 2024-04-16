@@ -1,0 +1,8 @@
+target/
+debug/
+
+*.class
+
+"Neural Networks: Theory and Practice"/*
+!"Neural Networks: Theory and Practice"/*Assignment*
+

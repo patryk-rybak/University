@@ -1,0 +1,138 @@
+(killall ssh-agent) WAZNE
+/etc/X11/Xsession.d/90x11-common_ssh-agent (TO TEZ)
+patryk@konkuter:/etc/xdg/autostart/gnome-keyring-ssh.desktop
+
+W skrócie, gnome-keyring jest narzędziem do bezpiecznego przechowywania haseł i kluczy, a gnome-keyring-ssh.desktop jest plikiem konfiguracyjnym używanym do uruchamiania agenta SSH w ramach gnome-keyring w środowisku graficznym GNOME.
+
+
+
+
+1.
+
+netstat -tuln | grep [0-9\s.]:22
+
+lub
+
+systemctl status ssh
+systemctl enable ssh
+sytemctl start ssh
+
+
+
+2.
+
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/dojana
+
+
+
+3.
+
+ssh-copy-id -i ~/.ssh/dojana.pub jantest@localhost
+
+
+
+4. 
+
+dodaje wpis na koncie patryk (~/.ssh/config)
+Host testowyjan
+    HostName localhost
+    User jantest
+    IdentityFile ~/.ssh/dojana
+
+ssh testowyjan
+
+Przydatne rzeczy które mogą się znaleźć w pliku ssh-config:
+
+    Host - nazwa określająca kofigurację hosta lub grupy hostów(można używać regexów żeby dopasować więcej niż jeden adres)
+    HostName - adres/nazwa do której będziemy się łączyć
+    User - nazwa użytkownika
+    Port - na którym porcie się łączymy (w komendzie ssh opcja -p)
+    IdentityFile - ścieżka do klucza prywatnego którego klient ssh ma użyć do autoryzacji
+    Compression - włącza/wyłącza kompresję poczas połączenia (ustawiamy za pomocą yes/no)
+
+
+
+
+5. 
+
+ssh-agent
+
+SSH_AUTH_SOCK=/tmp/ssh-XXXXXXga1MtD/agent.3456; export SSH_AUTH_SOCK;SSH_AGENT_PID=3457; export SSH_AGENT_PID; ssh-add -t 3600 dojana
+
+ssh-add -d dojana
+
+
+
+
+6.
+
+usermod -L jantest
+
+
+
+
+7.
+
+dodaje wpis do /etc/sudoers
+
+patryk ALL=(jantest) NOPASSWD: ALL
+
+za pomocą sudo visudo
+
+sprawdzam:
+sudo -u jantest ls /home/jantest/
+su jantest
+
+
+
+
+8. 
+
+usermod -U jantest
+
+usermod -e 1970-01-01 jantest
+
+su jantest
+ssh testowyjan
+
+
+
+
+9.
+
+usermod -e "" jantest
+
+sudo usermod -s /bin/false jantest
+
+su jantest
+sudo -u jantest ls /home/jantest
+ssh testowyjan
+
+Do czego służy polecenie nologin(8) i kiedy lepiej je używać zamiast false(1)?
+
+Polecenie nologin wyświetla informacje o tym, że konto jest tymczasowo niedostępne, dodatkową zaletą jest możliwość zmiany wyświetlanej wiadomości teraz co to nologin(8)
+
+sudo usermod -s /usr/sbin/nologin jantest
+
+dodaje tez plik /etc/nologin
+
+su jantest - zawartosc sie nie pojawia
+ssh testowyjan - zawartosc sie pojawia
+
+
+
+
+10.
+
+dodanie do /etc/ssh/sshd_config wpisu:
+PermitRootLogin no (domyslnie jest no)
+
+
+
+
+11.
+
+dodanie do /etc/ssh/sshd_config wpis:
+PasswordAuthentication no
+
+

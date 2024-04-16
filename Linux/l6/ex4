@@ -1,0 +1,77 @@
+pendrive byl bootowalny i posiadal dwie partycje, dlatego totalnie go wyczyscilem poleceniem:
+sudo dd if=/dev/zero of=/dev/sda bs=4096
+
+nadanie etykiety (etykieta to czesc (tak internet mowi i wierze):
+sudo fatlabel /dev/sda1 MY_LABEL
+
+to sprawdzi nazwe urzadzenia blokowego:
+lsblk -f
+(lsblk -o NAME,LABEL)
+
+sworzenie /media/my_precious/
+
+mkdir -m0 /media/my_precious/
+
+dodanie umask w /etc/fstab
+
+
+
+
+    r (read): 4
+    w (write): 2
+    x (execute): 1
+
+    Owner: rwx = 4+2+1 = 7
+    Group: r-- = 4+0+0 = 4
+    Others: r-- = 4+0+0 = 4
+
+    The results produce the three-digit value 744.
+
+
+
+JUZ NA SERIO
+
+na poczatku zidentyfiikowałem pendrivea za pomocą
+
+  df -Th
+
+przed formatym trzeba go odmontować
+
+  umount "/media/patryk/USB DISK"
+
+teraz formatcik
+
+  sudo mkfs.fat -F32 /dev/sda1
+
+mielismy tez ustawic etyiete (etykieta jest częścią systemu plików i służy do identyfikacji woluminu (czyli partycji))(tak mowi internet i wierze)
+
+  sudo fatlabel /dev/sda1 MY_PRECIOUS
+
+zaczynamy ograniac plik konfiguracyjny /etc/fstab, potrzebujemy do tego identyfikatora udbka - znajdujemy go komenda
+
+  sudo blkid
+
+teraz odpalamy /etc/fstab i wpisujemy nowa linijke
+
+  UUID=ECA5-40D4 /media/my_precious vfat defaults,user,noauto,umask=077,noexec 0 0
+
+  opis pozycji
+    - <UUID> to identyfikator UUID pendrive'a.
+      (Kiedy tworzysz nowy system plików na urządzeniu (np. pendrive), system operacyjny (np. Linux) generuje unikalny identyfikator UUID)
+    - /media/my_precious to ścieżka do katalogu, w którym chcesz zamontować pendrive.
+    - vfat to typ systemu plików pendrive'a (zakładając, że to system plików FAT).
+    - defaults,user,noauto,umask to opcje montowania.
+      defaults oznacza domyślne opcje montowania,
+      user umożliwia zwykłym użytkownikom montowanie i odmontowanie,
+      noauto oznacza, że pendrive nie będzie montowany automatycznie przy uruchomieniu systemu.
+      umask oznacza maska bitowa, która wyłącza (maskuje) określone uprawnienia plików i katalogów
+    - 0 0 oznacza, że te opcje są dotyczące kopii zapasowej i nie będą analizowane przy uruchamianiu systemu. (nizej innymi  slowami)
+    - 0 0 pierwsze zero oznacza, ze nie bedzie brane pod uwage przy tworzeniu kopii zapasowej, drugie ze poprawnosc zamontowanego systemu nie bedzie sprawdzana przy uruchamianiu itp
+
+towrzymy teraz katalog /media/my_precious/
+
+  mkdir -m0 /media/my_precious/
+
+
+
+

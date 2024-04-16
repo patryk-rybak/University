@@ -1,0 +1,126 @@
+mkdir /tmp/ramdisck
+
+mount -o size=2G -t tmpfs FAJNY_RAMDISK /tmp/ramdisk
+
+Kontener: W kontekście kryptografii dyskowej, "kontener" to po prostu logiczna struktura danych, która przechowuje zaszyfrowane informacje. Jest to rodzaj wirtualnego pojemnika, który można montować jako dysk logiczny, a następnie używać do przechowywania danych. Kontenery są często stosowane, aby zapewnić zabezpieczenie danych poprzez szyfrowanie.
+
+sudo fallocate -l 2G /mnt/ramdisk/container.img
+(fallocate - preallocate or deallocate space to a file)
+
+
+sudo cryptsetup luksFormat /mnt/ramdisk/container.img
+
+sudo cryptsetup luksOpen /mnt/ramdisk/container.img container
+
+
+
+
+sudo cryptsetup luksFormat /mnt/ramdisk/container.img: To polecenie inicjuje proces tworzenia zaszyfrowanego woluminu na podstawie pliku /mnt/ramdisk/container.img. Polecenie to tworzy nową nagłówkową strukturę zaszyfrowanego urządzenia za pomocą standardu LUKS (Linux Unified Key Setup), który jest standardem szyfrowania na platformie Linux. W tym momencie, podczas uruchamiania polecenia, będziesz proszony o podanie hasła lub klucza szyfrującego, który będzie używany do odblokowania urządzenia w przyszłości.
+
+sudo cryptsetup luksOpen /mnt/ramdisk/container.img container: Po utworzeniu nagłówka LUKS, ten krok otwiera (odblokowuje) zaszyfrowany kontener /mnt/ramdisk/container.img pod nazwą container. Podczas wykonywania tego polecenia, zostaniesz ponownie poproszony o podanie hasła lub klucza szyfrującego, który wcześniej ustawiłeś podczas wykonywania luksFormat. Po poprawnym odblokowaniu kontenera, utworzone urządzenie zaszyfrowane jest dostępne pod nazwą /dev/mapper/container i można na nim wykonywać operacje, takie jak tworzenie systemu plików czy montowanie.
+
+
+tworze katalog do montowania zmapowanego kontenera i ...
+sudo mount /dev/mapper/container /mnt/container
+
+
+i testowanie 
+
+sudo dd if=/dev/zero of=/tmp/cont/ok bs=1M count=1024 conv=fsync
+
+sudo dd if=/dev/zero of=proba bs=1M count=1024 conv=fsync
+
+sudo dd if=/tmp/cont/ok of=/dev/null bs=1M count=1024 conv=fsync
+
+sudo dd if=proba of=/dev/null bs=1M count=1024 conv=fsync
+
+
+
+JUŻ NA SERIO
+
+
+tworzymy katalog do montażu
+
+  mkdir /tmp/ramdisk
+  
+towrzymy tymczasowy system plikow w pamięci RAM i montujemy
+  
+  mount -o size=2G -t tmpfs FAJEN_RAMDISK /tmp/ramdisk
+
+tworzymy sobie kontener (rezerwujemy miejsce dla pliku)
+
+  Kontener: W kontekście kryptografii dyskowej, "kontener" to po prostu logiczna struktura danych,
+  która przechowuje zaszyfrowane informacje. Jest to rodzaj wirtualnego pojemnika, który można montować jako dysk logiczny,
+  a następnie używać do przechowywania danych. Kontenery są często stosowane,
+  aby zapewnić zabezpieczenie danych poprzez szyfrowanie.
+
+  sudo fallocate -l 2G /tmp/ramdisk/container.img
+  (fallocate - preallocate or deallocate space to a file)
+
+teraz ustawiamy szyfrowanie
+
+  sudo cryptsetup luksFormat --cipher aes-xts-plain64 /mnt/ramdisk/container.img
+
+  i teraz co to oznacza:
+
+    LUKS (Linux Unified Key Setup) - Jest to narzędzie, które umożliwia szyfrowanie całych partycji
+    lub woluminów na poziomie bloków danych, foramt LUKS jest wspierany i przez to przenosny
+
+    aes: Oznacza wybór algorytmu szyfrowania
+
+    xts: Oznacza tryb pracy algorytmu AES
+    
+    wypelnienia do wielkosci bloku - plain64, random, null, essiv(domyslne)
+
+
+teraz zeby korzystac z kontenera musimy go otworzyc
+
+  sudo cryptsetup luksOpen /tmp/ramdisk/container.img container
+
+  co to robi
+  tworzy nowe urzadzenie w /dev/mapped/container aby moc interpretowac plik (kontener) tak jak normalny dysku
+  oraz umozliwia zapis z odczytem z szyfrowaniem w locie 
+
+teraz w tym urzadzeniu blokowym tworzymy system plikow
+
+  sudo mkfs.ext4 /dev/mapper/container
+
+musimy go teraz zamontowac
+
+  mkdir /tmp/cont
+  sudo mount /dev/mapper/container /tmp/cont
+
+sprawdzamy
+
+  df -Th
+
+i testujemy
+  
+  sudo dd if=/dev/zero of=/tmp/cont/ok bs=1M count=1024 conv=fsync
+
+  sudo dd if=/dev/random of=~/proba bs=1M count=1024 conv=fsync
+
+  sudo dd if=/tmp/cont/ok of=/dev/null bs=1M count=1024 
+
+  sudo dd if=~/proba of=/dev/null bs=1M count=1024 
+
+
+tak wygladaja wyniki - ram dalej wolniejszy
+
+  patryk@konkuter:/tmp/cont$   sudo dd if=/dev/zero of=/tmp/cont/ok bs=1M count=1024 conv=fsync
+  1024+0 records in
+  1024+0 records out
+  1073741824 bytes (1,1 GB, 1,0 GiB) copied, 1,69177 s, 635 MB/s
+  patryk@konkuter:/tmp/cont$   sudo dd if=/dev/random of=~/proba bs=1M count=1024 conv=fsync
+  1024+0 records in
+  1024+0 records out
+  1073741824 bytes (1,1 GB, 1,0 GiB) copied, 4,98776 s, 215 MB/s
+  patryk@konkuter:/tmp/cont$   sudo dd if=/tmp/cont/ok of=/dev/null bs=1M count=1024 
+  1024+0 records in
+  1024+0 records out
+  1073741824 bytes (1,1 GB, 1,0 GiB) copied, 0,174274 s, 6,2 GB/s
+  patryk@konkuter:/tmp/cont$   sudo dd if=~/proba of=/dev/null bs=1M count=1024 
+  1024+0 records in
+  1024+0 records out
+  1073741824 bytes (1,1 GB, 1,0 GiB) copied, 0,169657 s, 6,3 GB/s
+
