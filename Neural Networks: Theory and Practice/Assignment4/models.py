@@ -27,40 +27,6 @@ class NN1(nn.Module):
         x = self.fc5(x)
         return x
 
-class CNN3_sig(nn.Module):
-    def __init__(self, hidden_dim=1000, out_dim=3, device='cpu'):
-        super(CNN3, self).__init__()
-        self.device = device
-
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=5, padding=2, stride=1)
-        self.norm1 = nn.BatchNorm2d(64)
-        self.conv2 = nn.Conv2d(64, 64, kernel_size=4, padding=2, stride=1)
-        self.norm2 = nn.BatchNorm2d(64)
-        self.conv3 = nn.Conv2d(64, 64, kernel_size=2, padding=1, stride=1)
-        self.norm3 = nn.BatchNorm2d(64)
-        self.conv4 = nn.Conv2d(64, 64, kernel_size=2, padding=1, stride=1)
-        self.norm4 = nn.BatchNorm2d(64)
-
-        self.relu = nn.ReLU()
-        # self.sig = nn.Sigmoid()
-        self.faltten = nn.Flatten()
-
-        self.fc1 = nn.Linear(9*10*64, 1000)
-        self.fc2 = nn.Linear(1000, 500)
-        self.fc3 = nn.Linear(500, 3)
-        #  moze dodac jeszcze jakas aktywacje miedzy full connected
-
-    def forward(self, x):
-        x = self.norm1(self.relu(self.conv1(x.to(device))))
-        x = self.norm2(self.relu(self.conv2(x)))
-        x = self.norm3(self.relu(self.conv3(x)))
-        x = self.norm4(self.relu(self.conv4(x)))
-        x = self.faltten(x)
-        x = self.relu(self.fc1(x))
-        x = self.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
-
 class CNN3(nn.Module):
     def __init__(self, hidden_dim=1000, out_dim=3, device='cpu'):
         super(CNN3, self).__init__()
