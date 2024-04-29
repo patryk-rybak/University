@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+calculate() {
+  res=0
+  while true; do
+    ((res++))
+  done
+}
+
+for i in $(seq 1 $1); do
+  niceness=$((RANDOM % 40 - 20))
+  calculate &
+  renice $niceness $!
+done
+
+wait # podobno to jest crusial

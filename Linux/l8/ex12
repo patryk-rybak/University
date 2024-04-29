@@ -1,0 +1,13 @@
+run-parts --test /etc/cron.daily
+
+Parametr --test sprawia, że run-parts wyświetla tylko skrypty, które byłyby wykonane, ale nie wykonuje ich faktycznie.
+
+Polecenie run-parts nie powoduje automatycznego wczytywania pliku .bashrc, a jedynie uruchamia skrypty z katalogu .bashrc.d. Jeśli chcesz, aby zmiany w plikach konfiguracyjnych .bashrc.d miały wpływ na bieżącą sesję powłoki, musisz ręcznie wczytać te pliki, na przykład za pomocą komendy source lub .
+
+Polecenie run-parts jest narzędziem używanym do wykonywania wszystkich plików z określonego katalogu. Działa ono następująco:
+
+    Przyjmuje jako argument ścieżkę do katalogu.
+    Przeszukuje ten katalog w poszukiwaniu plików, które nie są ukryte (nie zaczynają się od kropki).
+    Wykonuje każdy znaleziony plik, ale tylko jeśli jest on wykonywalny (ma ustawiony bit wykonywalności).
+
+

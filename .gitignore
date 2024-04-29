@@ -2,6 +2,8 @@ target/
 debug/
 
 *.class
+*.pth
+*.pt
 
 "Neural Networks: Theory and Practice"/*
 !"Neural Networks: Theory and Practice"/*Assignment*
