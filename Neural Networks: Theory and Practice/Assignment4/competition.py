@@ -44,11 +44,10 @@ if __name__ == '__main__':
     A = MyAgent(CNN1, 'CNN1.pth', device) # 65%
     # A = MyAgent(CNN2, 'CNN2.pth', device) # 35%
     # A = MyAgent(CNN3, 'CNN3.pth', device) # 40%
-    # A = MyAgent(CNN2, 'CNN2_stare.pth', device) # nie dziala
     # A = MyAgent(NN1, 'NN1.pth', device) # 72%
     B = AgentRandom()
     # B = AgentMC(50)    
     # B = AgentMC(10)
     # B = AgentMinMaxMC(3,10)
     
-    duel(A, B, 1000)    
+    duel(A, B, 500)    
