@@ -1,0 +1,340 @@
+SELECT c_name, SUM(o_totalprice) AS suma_zamowien
+FROM customer
+JOIN orders ON (c_custkey = o_custkey)
+JOIN nation ON (c_nationkey = n_nationkey)
+JOIN region ON (n_regionkey = r_regionkey)
+WHERE EXTRACT(year FROM o_orderdate) = 1997
+AND r_name='EUROPE'
+GROUP BY c_custkey
+HAVING SUM(o_totalprice) > 500000
+ORDER BY c_name DESC;
+
+WITH
+    cust_suma AS (
+        SELECT c_name, c_nationkey, SUM(o_totalprice) AS suma 
+        FROM customer 
+        JOIN orders ON (c_custkey = o_custkey)
+        WHERE EXTRACT(year FROM o_orderdate) = 1997
+        GROUP BY c_custkey
+    ),
+
+    nat_max_sum AS (
+        SELECT n_name, MAX(suma) AS maks
+        FROM nation 
+        LEFT JOIN cust_suma ON (cust_suma.c_nationkey = nation.n_nationkey)
+        GROUP BY n_nationkey
+    )
+SELECT n_name, c_name, maks
+FROM nat_max_sum
+LEFT JOIN cust_suma ON nat_max_sum.maks = cust_suma.suma;
+
+WITH
+    c_j_pln as (
+        SELECT DISTINCT company.id AS comp_id, offer.id AS off_id, type FROM offer
+        JOIN company ON (offer.company_id = company.id)
+        JOIN employment_details ON (employment_details.offer_id = offer.id)
+        WHERE currency = 'pln'
+        AND remote = true
+    ),
+
+    comp_perm as (
+        SELECT DISTINCT c_j_pln.comp_id FROM c_j_pln
+        WHERE type LIKE 'permanent'
+    )
+SELECT name, comp_id, COUNT(DISTINCT off_id) FROM c_j_pln
+JOIN company ON (id = comp_id)
+WHERE comp_id NOT IN (SELECT * FROM comp_perm)
+GROUP BY name, comp_id
+ORDER BY 3 DESC, 1;
+
+WITH
+    off as (
+        SELECT id, salary_from FROM offer
+        JOIN employment_details ON (offer.id = employment_details.offer_id)
+        WHERE employment_details.type = 'permanent'
+        AND city = 'Wrocław'
+        AND currency = 'pln'
+        AND salary_from > 0
+    ),
+
+    skill_min as (
+        SELECT name, MIN(salary_from) as min FROM skill
+        JOIN off ON (off.id = skill.offer_id)
+        GROUP BY name
+    )
+SELECT skill.name, MIN(salary_from) FROM off
+JOIN skill ON (off.id = skill.offer_id)
+GROUP BY skill.name
+HAVING MIN(salary_from) >= (SELECT AVG(salary_from) FROM off)
+ORDER BY 2 DESC, 1;
+
+SELECT skill.name,
+       COUNT(DISTINCT offer.title) as stanowskika,
+       COUNT(DISTINCT offer.id) as oferty,
+       MIN(skill.value) as min,
+       MAX(skill.value) as max,
+       AVG(skill.value) as avg
+FROM offer
+JOIN skill ON (offer.id = skill.offer_id)
+GROUP BY (skill.name)
+ORDER BY 2 DESC, 3 DESC;
+
+SELECT offer.title,
+       COUNT(DISTINCT skill.name) as count,
+       (array_agg(DISTINCT skill.name))[1:4] as dupa
+FROM offer
+JOIN skill ON (offer.id = skill.offer_id)
+GROUP BY (offer.title)
+HAVING COUNT(DISTINCT skill.name) > 20
+ORDER BY count DESC, offer.title;
+
+SELECT DISTINCT company.name
+FROM company
+LEFT JOIN offer ON (company.id = offer.company_id) 
+WHERE offer.id NOT IN (
+    SELECT DISTINCT offer.id
+    FROM offer
+    JOIN skill ON (offer.id = skill.offer_id)
+    WHERE skill.name ILIKE '%sql%'
+    OR skill.name ILIKE '%database%'
+)
+ORDER BY 1;
+
+SELECT DISTINCT company.name
+FROM company
+EXCEPT
+SELECT company.name
+FROM company
+JOIN offer ON (company.id = offer.company_id)
+JOIN skill ON (offer.id = skill.offer_id)
+WHERE skill.name ILIKE '%sql%'
+OR skill.name ILIKE '%database%'
+ORDER BY 1;
+
+WITH
+    dupcia AS (
+        SELECT company_branch.city  
+        FROM company_branch
+        JOIN offer ON (company_branch.id = offer.company_branch_id)
+        GROUP BY (company_branch.city)
+        ORDER BY COUNT(offer.id) DESC
+        LIMIT 10
+    ),
+    cyce AS (
+        SELECT DISTINCT offer.id, company_branch.city
+        FROM offer
+        JOIN skill ON (offer.id = skill.offer_id)
+        JOIN company_branch ON (company_branch.id = offer.company_branch_id)
+        WHERE skill.name LIKE '%Snowflake%'
+    )
+SELECT dupcia.city, COUNT(cyce.id)
+FROM dupcia
+LEFT JOIN cyce ON (dupcia.city = cyce.city)
+GROUP BY (dupcia.city)
+ORDER BY COUNT(cyce.id) DESC;
+
+WITH
+    dupa AS (
+        SELECT c_custkey, c_name, c_nationkey, SUM(o_totalprice) as sum
+        FROM customer
+        JOIN orders ON (c_custkey = o_custkey)
+        WHERE EXTRACT(year FROM o_orderdate) = 1970
+        GROUP BY (c_custkey)
+    ),
+    cyce AS (
+        SELECT n_nationkey, n_name, MAX(sum) as max
+        FROM nation
+        JOIN dupa ON (n_nationkey = c_nationkey)
+        GROUP BY n_nationkey
+    )
+SELECT nation.n_name, c_name, sum
+FROM nation
+LEFT JOIN (
+    SELECT n_name, c_name, sum
+    FROM dupa
+    JOIN cyce ON (dupa.c_nationkey = cyce.n_nationkey)
+    WHERE (sum = max)
+) AS temp ON (temp.n_name = nation.n_name);
+
+SELECT c_custkey, c_name
+FROM customer
+WHERE c_phone LIKE '34-83%';
+
+SELECT *
+FROM customer
+JOIN nation ON c_nationkey = n_nationkey
+WHERE n_name = 'UNITED STATES'
+AND c_acctbal > 9000
+AND c_mktsegment = 'BUILDING'
+ORDER BY c_name ASC;
+
+SELECT s_name, s_suppkey
+FROM (
+    SELECT s_name, s_suppkey
+    FROM region
+    JOIN nation ON n_regionkey = r_regionkey
+    JOIN supplier ON s_nationkey = n_nationkey
+    WHERE r_name = 'ASIA'
+) AS pierwsze
+JOIN (
+    SELECT DISTINCT(ps_suppkey)
+    FROM part
+    JOIN partsupp ON p_partkey = ps_partkey
+    WHERE p_size = 50
+    AND p_type LIKE '%BRUSHED BRASS'
+) AS drugie
+ON s_suppkey = ps_suppkey;
+
+SELECT c_name, SUM(o_totalprice) AS suma
+FROM customer
+JOIN orders ON (c_custkey = o_custkey)
+JOIN nation ON (c_nationkey = n_nationkey)
+JOIN region ON (n_regionkey = r_regionkey)
+WHERE r_name = 'EUROPE'
+AND EXTRACT (year FROM o_orderdate) = 1997
+GROUP BY c_custkey
+HAVING SUM(o_totalprice) > 500000
+ORDER BY 1 DESC;
+
+WITH ordertotals AS (
+    SELECT c_nationkey, c_name, SUM(o_totalprice) AS total
+    FROM customer JOIN orders ON c_custkey = o_custkey
+    WHERE EXTRACT('YEAR' FROM o_orderdate) = 1997
+    GROUP BY c_custkey
+)
+SELECT n_name, c_name, total
+FROM (SELECT c_nationkey, MAX(total) AS total
+      FROM ordertotals
+      GROUP BY c_nationkey
+     ) AS foo
+NATURAL JOIN ordertotals
+RIGHT JOIN nation ON c_nationkey = n_nationkey;
+
+SELECT DISTINCT company.name
+FROM company
+JOIN (SELECT company_id FROM offer JOIN
+skill ON (id = offer_id)
+WHERE name LIKE '%PostgreSQL%'
+OR name ILIKE '%postres%') as foo ON (company_id = id)
+ORDER BY 1;
+
+CREATE TABLE salary (
+  salary_from decimal,
+  salary_to decimal,
+  offer_id int REFERENCES offer (id),
+  type text CONSTRAINT ok CHECK(type IN ('a', 'b', 'c')),
+  currency text);
+
+INSERT INTO salary
+SELECT salary_from_b2b::decimal, salary_to_b2b::decimal, id, 'b2b', salary_currency_b2b
+FROM offer
+WHERE salary_currency_b2b <> 'unknown'
+AND salary_from_b2b::decimal > 0;
+
+ALTER TABLE saalry
+ALTER COLUMNT salary_from_b2b
+SET DATA TYPE decimal
+USING salary_from_b2b::decimal;
+
+ALTER TABLE salary DROP COLUMN if_b2b;
+
+CREATE OR REPLACE FUNCTION pierwszy_zapis(int, int)
+RETURNS timestamp AS $X$
+SELECT MIN(data) as min FROM wybor
+JOIN grupa USING(kod_grupy)
+JOIN przedmiot_semestr USING(kod_przed_sem)
+WHERE wybor.kod_uz = $1
+AND przedmiot_semestr.semestr_id = $2
+$X$ LANGUAGE sql;
+
+SELECT DISTINCT u.nazwisko,
+pierwszy_zapis(u.kod_uz, s.semestr_id) FROM uzytkownik u
+JOIN wybor w USING (kod_uz)
+JOIN grupa g USING (kod_grupy)
+JOIN przedmiot_semestr ps USING (kod_przed_sem)
+JOIN semestr s USING (semestr_id)
+WHERE u.nazwisko LIKE 'A%'
+AND s.nazwa = 'Semestr zimowy 2016/2017'
+ORDER BY 2;
+
+CREATE TYPE temp AS
+(nazwa text, rodzaj character(1), termin character(13), sala character varying(3)
+, l_zapisanych INT);
+
+CREATE OR REPLACE FUNCTION plan_zajec_prac(int, int)
+RETURNS SETOF temp AS $$
+SELECT p.nazwa, p.rodzaj, g.termin, g.sala, COUNT(w.kod_uz) as l_zapisanych
+FROM przedmiot p JOIN przedmiot_semestr ps ON (p.kod_przed = ps.kod_przed)
+JOIN grupa g ON (ps.kod_przed_sem = g.kod_przed_sem)
+JOIN wybor w ON (w.kod_grupy = g.kod_grupy)
+WHERE g.kod_uz = $1
+AND ps.semestr_id = $2
+GROUP BY p.nazwa, p.rodzaj, g.termin, g.sala;
+$$ LANGUAGE sql;
+
+CREATE TABLE arch LIKE(offers);
+
+CREATE OR REPLACE FUNCTION archiwizuj() RETURNS TRIGGER AS $$
+BEGIN
+INSERT INTO arch SELECT OLD.*;
+RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER archiwizuj_wpis AFTER DELETE ON offer FOR EACH ROW
+EXECUTE PROCEDURE archiwizuj();
+
+ALTER TABLE company ADD COLUMN aktualne int DEFAULT 0;
+ALTER TABLE company ADD COLUMN wszsytkie int DEFAULT 0;
+
+CREATE OR REPLACE FUNCTION zmien1() RETURNS TRIGGER AS $$
+BEGIN;
+UPDATE company SET aktualne = aktualne - 1
+WHERE company.id = OLD.company_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION zmian2() RETURNS TRIGGER AS $$
+BEGIN;
+UPDATE company SET aktualne = aktualne + 1
+WHERE company.id = OLD.company_id;
+UPDATE company SET wszsytkie = wszsytkie + 1
+WHERE company.id = OLD.company_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER zmiena1 AFTER DELETE ON offer FOR EACH ROW
+EXECUTE PROCEDURE zmien1();
+
+CREATE TRIGGER zmiana2 AFTER INSERT ON offer FOR EACH ROW
+EXECUTE PROCEDURE zmien2();
+
+ALTER TABLE Tag ADD COLUMN use_count INT DEFAULT 0;
+
+CREATE OR REPLACE FUNCTION fn_process_post(content text)
+RETURNS VOID AS $$
+DECLARE
+temp text;
+BEGIN
+FOR temp IN
+(SELECT DISTINCT regexp_matches(content, '(?:\A|\s)(#\w*[a-zA-Z]\w*)','gi'))
+LOOP
+IF temp NOT IN (SELECT name FROM Tag) THEN
+INSERT INTO Tag VALUES((SELECT MAX(id) + 1 FROM Tag), temp, NULL, 0);
+END IF;
+UPDATE Tag SET use_count = use_count + 1
+WHERE Tag.name = temp;
+END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION po_dodaniu() RETURNS TRIGGER AS $$
+BEGIN
+SELECT fn_process_post(NEW.content);
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER wyzm AFTER INSERT ON post FOR EACH ROW
+EXECUTE PROCEDURE po_dodaniu();
+
+
