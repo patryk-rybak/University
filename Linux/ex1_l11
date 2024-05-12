@@ -1,0 +1,160 @@
+# Zadanie 1
+
+Różnice w `fdisk(8)` i `parted(8)` są miedzy innymi takie, że fdisk nie nanosi zmian
+"w locie" w przeciwieństwie do `parted(8)` i zmiany należy powierdzić przed wyjściem
+z programu, `parted(8)` umożliwia tworzenie partycji, których rozmiary można zmieniać oraz `fdisk(8)` posiada ograniczenie dla wielkości tworzonej partycji wynoszące 2 TB.
+
+##    
+
+Tworzymy obraz dysku.
+```
+touch disk.img
+truncate -s $((512 * 976580000)) disk.img
+```
+Uruchamiamy program fdisk z trybem zgodnosci `dos`.
+```
+fdisk -c=dos disk.img
+```
+W ten sposób automatycznie zowstał stworzony sektor MBR z tablicą partycji. Aby to sprawdzić należy zapisać ustawienia i wyświetlić pierwszy sektor dysku.
+```
+Command (m for help): w
+hexdump -n 512 -s 0 -C disk.img
+```
+
+Dodajemy partycje za pomoca fdisk(8).
+```
+fdisk -c=dos disk.img
+```
+```
+n p 1 63 67108863
+n p 2 67108864 486539263
+n e 4 629145600 976579999
+```
+Nadajemy typy.
+```
+t 1 0x0c
+t 2 0x83
+t 4 0x05
+```
+Dodajemy partycje logiczne z typami.
+```
+n l 629147648 713033727
+n l 975175680 976199679
+t 5 0x83
+t 6 0x82
+```
+Mozemy wyprintowac aktualny stan ustawień ```p``` i zapisać usawienia.
+```
+Command (m for help): p
+```
+```
+Disk disk.img: 465,67 GiB, 500008960000 bytes, 976580000 sectors
+Geometry: 255 heads, 63 sectors/track, 60789 cylinders
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xd5cf9743
+
+Device     Boot     Start       End   Sectors   Size Id Type
+disk.img1              63  67108863  67108801    32G  c W95 FAT32 (LBA)
+disk.img2        67108864 486539263 419430400   200G 83 Linux
+disk.img4       629145600 976579999 347434400 165,7G  5 Extended
+disk.img5       629147648 713033727  83886080    40G 83 Linux
+disk.img6       975175680 976199679   1024000   500M 82 Linux swap / Solaris
+```
+```
+Command (m for help): w
+```
+Mozemy sprawdzic teraz jak wygalda tablica partycji w MBR.
+```
+hexdump -n 512 -s 0 -C disk.img
+```
+```
+00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+000001b0  00 00 00 00 00 00 00 00  43 97 cf d5 00 00 00 01  |........C.......|
+000001c0  01 00 0c fe ff ff 3f 00  00 00 c1 ff ff 03 00 fe  |......?.........|
+000001d0  ff ff 83 fe ff ff 00 00  00 04 00 00 00 19 00 00  |................|
+000001e0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 fe  |................|
+000001f0  ff ff 05 fe ff ff 00 00  80 25 a0 6d b5 14 55 aa  |.........%.m..U.|
+00000200
+```
+Oraz tablica partycji w EBR (sekcja 1 w partycji rozszerzonej)
+```
+hexdump -n 512 -s $((512 * 629145600)) -C disk.img
+```
+```
+4b00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+4b000001b0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 fe  |................|
+4b000001c0  ff ff 83 fe ff ff 00 08  00 00 00 00 00 05 00 fe  |................|
+4b000001d0  ff ff 05 fe ff ff c1 ff  9f 14 3f a0 0f 00 00 00  |..........?.....|
+4b000001e0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+4b000001f0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 55 aa  |..............U.|
+4b00000200
+```
+Z jakiegoś powodu EBR zaczynające się w sekcji 975173632 jest wyzerowane.
+```
+hexdump -n 512 -s $((512 * 975173632)) -C disk.img
+```
+```
+743ff00000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+743ff00200
+```
+##    
+
+`losetup(8)` służy do kojarzenia urządzeń loop (pętli) z plikami zwykłymi lub urządzeniami blokowymi, do odłączania urządzeń loop i sprawdzania ich stanu. 
+
+--find szuka pierwszego nieużywanego urządzenia loop, --partscan wymusza na jądrze skanowanie tablic partycji na nowo dodanym urządzeniu loop, a --show (w użyciu z --find i nazwą pliku będącą argumentem) wyświetla nazwę przypisanego urządzenia loop.
+```
+--show
+    Display the name of the assigned loop device if the -f option and a file 
+    argument are present.
+-f, --find [file]
+    Find the first unused loop device. If a file argument is present, use the
+    found device as loop device. Otherwise, just print its name.
+-P, --partscan
+    Force the kernel to scan the partition table on a newly created loop
+    device. Note that the partition table parsing depends on sector sizes. The
+    default is sector size is 512 bytes, otherwise you need to use the option
+    --sector-size together with --partscan.
+```
+
+Znajdujemy wolne nieużywane loop device i kojarzymy je z disk.img forceując kernel do zeskanowania tablicy partycji na nowo utworzonym urządzneiu.
+```
+losetup -fP disk.img
+```
+
+##    
+`partx(8)` Given a device or disk-image, partx tries to parse the partition table and list its contents. It can also tell the kernel to add or remove partitions from its bookkeeping.
+
+Działa na tablicach partycji, ale nie tworzy urządzeń pętli dla partycji. Działa bezpośrednio na urządzeniach blokowych.
+
+przykład:
+```
+partx --show disk.img
+```
+
+##    
+`partprobe(8)` is a program that informs the operating system kernel of partition table changes.
+
+Używa się go, gdy zmieniłeś tablicę partycji na urządzeniu (np. dodanie, usunięcie partycji) i chcesz, aby jądro Linuksa ponownie wczytało tę tablicę partycji bez konieczności ponownego uruchamiania systemu.
+
+przykład:
+```
+sudo partprobe -s /dev/loop0
+```
+
+##    
+`kpartx(8)` this tool, derived from util-linux' partx, reads partition tables on specified
+       device and create device maps over partitions segments detected. It is  called
+       from hotplug upon device maps creation and deletion.
+       
+Automatycznie wykrywa partycje w urządzeniu i tworzy odpowiednie urządzenia pętli dla każdej z nich.
+
+przykład:
+```
+sudo kpartx -a /dev/loopX
+```
