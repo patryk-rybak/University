@@ -1,5 +1,4 @@
 import torch
-import random
 import itertools
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.nn import functional as F

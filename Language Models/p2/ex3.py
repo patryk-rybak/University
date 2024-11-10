@@ -7,7 +7,8 @@ logging.set_verbosity_error()
 
 # model_name = 'flax-community/papuGaPT2'
 model_name = 'eryk-mazus/polka-1.1b'
-device = 'cpu'
+#device = 'cpu'
+device = 'cuda'
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
