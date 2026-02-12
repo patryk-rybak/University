@@ -1,0 +1,35 @@
+﻿<#@ template language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ assembly name="/usr/bin/../lib/dotnet/shared/Microsoft.NETCore.App/9.0.5/System.Private.Xml.dll" #>
+
+<#
+  var xml = XDocument.Load("model.xml");
+  var classes = xml.Root.Elements("Class");
+
+  foreach (var classElem in classes)
+  {
+      var className = classElem.Attribute("name").Value;
+      var fields = classElem.Elements("Field");
+#>
+
+public class <#= className #>
+{
+<#
+      foreach (var field in fields)
+      {
+          var fieldType = field.Attribute("type").Value;
+          var fieldName = field.Attribute("name").Value;
+#>
+    public <#= fieldType #> <#= fieldName #> { get; set; }
+<#
+      }
+#>
+}
+
+<#
+  }
+#>
+

@@ -1,0 +1,10 @@
+Zasada	SRP – Single Responsibility	ISP – Interface Segregation
+Co kontroluje?	Odpowiedzialność klas	Odpowiedzialność interfejsów
+Cel	Klasa powinna robić tylko jedną rzecz	Klasa nie powinna implementować metod, których nie używa
+Przykład problemu	Klasa „drukarka” formatuje i drukuje raporty	Robot musi zaimplementować Eat(), chociaż tego nie potrzebuje
+Jak naprawić?	Rozbić klasę na mniejsze	Podzielić interfejsy
+
+SRP → Rozdzielamy klasy według odpowiedzialności.
+
+ISP → Rozdzielamy interfejsy, żeby klasy nie implementowały niepotrzebnych metod.
+

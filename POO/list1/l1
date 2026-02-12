@@ -1,0 +1,131 @@
+zadanie 1
+
+
+FURPS z wykladu:
+Functional Funkcjonalności, możliwości, bezpieczeństwo
+Usability Czynnik ludzki, pomoc, dokumentacja
+Reliability Awaryjność, odzyskiwanie, przewidywalność
+Performance Czas reakcji, przepustowość, dokładność, dostępność, wykorzystanie zasobów
+Supportability Dostosowanie, utrzymanie, konfiguracja, lokalizacja
+
+
+Przedmiotem zamówienia jest stworzenie aplikacji obejmującej:
+1.    natywną aplikację mobilną działającą na urządzeniach przenośnych z systemami Android,
+2.    panel administracyjny do zarządzania treścią wyświetlaną w natywnej aplikacji.
+
+https://przetargi.uj.edu.pl/documents/1378124/143234079/Aplikacja-zalacznik-Zadanie+6+-+Opis+przedmiotu+-+2019-07-30.pdf/2e0f9901-d123-41c3-90da-583320474ff0
+
+
+
+Functional
+
+Na ekranie modułu pod planem, ostatnia wpisana ocena pojawia się przez 3 dni po otrzymaniu wiadomości push, następnie znika.
+
+- Co jeśli w ciągu 3 dni pojawią się dwie nowe oceny? Mają być wyświetlone dwie czy pierwsza z nich ma zniknąć?
+
+Moduł grywalizacji: Celem generatora do tworzenia gier, który ma stanowić element aplikacji, będzie umożliwienie administratorom definiowania nowych gier w ramach pewnego schematu, niewymagającego znajomości zasad i języków programowania.
+
+- Co dokładnie rozumiemy przez pewny schemat? Jak rozbudowany ma to być schemat?
+
+
+
+Usability
+
+Aplikacja mobilna i aplikacja webowa spełniać będzie standardy WCAG 2.1 określone w ustawie z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych i aplikacji mobilnych podmiotów publicznych.
+
+- Jaki nacisk przykładamy do spełnienia szczegółowych wytycznych? Dążymy do ogólnego spełniania większości standardów czy powinniśmy rozpatrzyć dokładnie każdy przepis z ustawy?
+
+Wykonawca zorganizuje szkolenia z zakresu wprowadzania treści i zarządzania aplikacją dla oddelegowanych pracowników Zamawiającego (maksymalnie 80 osób, w formie 6 grup po 15 osób, w terminach wskazanych przez Zamawiającego z co najmniej 5-dniowym wyprzedzeniem).
+
+- Ile powinno trwać takie szkolenie? Kto pokryje jego koszty i wskaże lokalizację?
+
+
+
+Reliability
+
+Wsparcie techniczne udzielane będzie w następującym reżimie czasowym:
+<tabelka>
+
+- W jaki sposób zgłaszane będą błędy?
+
+
+
+Supportability
+
+Aplikacja mobilna musi działać na wszystkich urządzeniach mobilnych wykorzystujących system Android (od wersji 8.0) oraz iOS (od wersji 11.0). Aplikacja webowa musi działać w każdej typowej przeglądarce internetowej (Chrome, Firefox, Safari, Edge), w wersjach wydanych w roku 2018 i później, na urządzeniach mobilnych i stacjonarnych
+
+- Czy powinniśmy zachęcać użytkówników do pobrania aplikacji mobilnej podczas korzystania z aplikacji webowej na urządzeniu mobilnym?
+
+Aplikacja musi wykorzystywać dostępne w urządzeniach moduły GPS do określania aktualnej lokalizacji.
+
+- Jakie konkretnie wersje modułów GPS mają być wspierane?
+
+Obsługa map w trybie online, zintegrowanych z systemem operacyjnym urządzenia mobilnego (Google Maps dla Android i Maps dla iOS, przy możliwości uruchomienia Google Maps w iOS).
+
+- Która z najstarszych wersji Google Maps powinna być już wspierana?
+
+
+
+
+
+zadanie 2
+
+Gherkin
+
+Nazwa: Oceń restaurację
+Numer: 1
+Twórca: Jan Kowalsky
+Poziom ważności: Wysoki
+Typ przypadku użycia: Ogólny, niezbędny
+Aktorzy: Użytkownik aplikacji
+Krótki opis: Ocena wybranej restauracji
+Warunki wstępne: Użytkownik znajduje się na podstronie konkretnej nieocenionej resturacji
+Warunki końcowe: Użytkownik znajduje się na podstronie ocenionej przez siebie restauracji wskazanej w warunkach wstępnych (pole wyżej)
+Główny scenariusz sukcesu:
+
+    Użytkownik klika przycisk: "Oceń restaurację"
+    System wyświetla popup do oceny restauracji (1-5 gwiazdek)
+    Użytkownik klika odpowiednią liczbę gwiazdek
+    Użytkownik klika przycisk: "Zatwierdź ocenę"
+    System chowa popup i wyświetla zaktualizowaną o ocenę użytkownika stronę restuaracji
+
+Alternatywne przepływy zdarzeń:
+3b) Jeżeli w kroku 3 użytkownik rozmyślił się i nie chce dokonać oceny użytkownik klika przycisk "x" w prawym górnym rogu popupu i następuje przejście do ekranu opisanego w warunkach wstępnych
+
+Wyjątki w przepływach:
+Jeżeli z powodu awarii system nie jest w stanie uwzględnić oceny użytkownika następuje przekierowanie do ekranu opisanego w warunkach wstęnych oraz wyświetlony zostaje odpowiedni komunikat błędu
+
+Specjalne wymagania: brak
+
+Notatki: Po kliknięciu przycisku "Zatwierdź ocenę" dopuszczalne jest opóźnienie trwające maksymalnie do 2 sekund.
+
+
+
+
+zadanie 3
+
+Model pojęciowy systemu wewnętrznego firmy zajmującej się obsługą eventów
+
+
+
+pracownik - użytkownik systemu z "rolą"
+
+kierownik - użytkownik systemu, który może wykonywać akcje wymagające "uprawnień kierowniczych", jak również może wykownywać wszystkie akcje, które są dostępne dla "pracownika"
+
+uprawnienia kierownicze - uprawnienia umożliwiające dodawanie nowych "eventów" oraz "rozliczanie pracowników"
+
+rozliczanie pracowników - akcja polegająca na utworzeniu "faktur" przez "kierownika" na podstawie znajdujących się w systemie danych rozliczeniowych oraz wysłaniu "faktur" do "pracowników"
+
+faktura - dokument zawierający liczbę godzin przepracowanych przez "pracowników" w konretnych rolach w danym miesiącu wraz z wyliczeniem wynagrodzenia
+
+rola - szczegółowy rodzaj wykonywanej pracy z jednoznacznie przypisaną w systemie "stawką godzinową"
+
+stawka godzinowa - zapłata brutto za 1 godzinę pracy wykonywaną przez 1 pracownika w określonej "roli"
+
+dodawanie nowych eventów - akcja polegająca na wprowadzenie do systemu nowych "eventów" przez kierownika
+
+event - wydarzenie publicze (np. koncert) wymagające zatrudnienia do jego obsługi określonej liczby "pracowników" dla każdej "roli" przypisanej do eventu
+
+
+
+zadanie 4

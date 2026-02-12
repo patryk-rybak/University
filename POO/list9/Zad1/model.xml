@@ -1,0 +1,7 @@
+<Classes>
+  <Class name="Person">
+    <Field name="Name" type="string" />
+    <Field name="Age" type="int" />
+  </Class>
+</Classes>
+

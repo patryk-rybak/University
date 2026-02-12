@@ -1,0 +1,18 @@
+psql -U orm_user -d orm_demo -h localhost
+
+
+sudo -i -u postgres
+
+sudo find /etc/postgresql -name pg_hba.conf
+local   all             all                                     md5
+
+sudo systemctl restart postgresql
+
+psql -U orm_user -d orm_demo -h localhost
+
+GRANT USAGE ON SCHEMA public TO orm_user;
+GRANT CREATE ON SCHEMA public TO orm_user;
+
+DATABASE_URL = "postgresql+psycopg2://orm_user:orm_password@localhost:5432/orm_demo"
+
+

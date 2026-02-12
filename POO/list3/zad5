@@ -1,0 +1,27 @@
+aplikacja korzysta wyłącznie z zewnętrznych dostawców logowania (jak Google czy Facebook) i nie pozwala na lokalne tworzenie czy usuwanie użytkowników, metody CreateAsync i DeleteAsync stają się zbędne
+
+IUserStore<TUser> Interface
+
+	CreateAsync(TUser user, CancellationToken cancellationToken)
+
+	DeleteAsync(TUser user, CancellationToken cancellationToken)
+
+	FindByIdAsync(string userId, CancellationToken cancellationToken)
+
+	FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+
+	UpdateAsync(TUser user, CancellationToken cancellationToken)
+
+
+interface IUserRetrievalStore<TUser>
+{
+    Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken);
+    Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken);
+}
+
+interface IUserManagementStore<TUser>
+{
+    Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken);
+    Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken);
+    Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken);
+}

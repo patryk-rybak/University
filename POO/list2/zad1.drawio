@@ -1,0 +1,66 @@
+<mxfile host="app.diagrams.net" modified="2024-03-12T06:04:52.177Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="HCMFp2UfPZGk-WLkQgTk" version="24.0.2" type="device">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="1050" dy="564" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="zkfFHV4jXpPFQw0GAbJ--0" value="&lt;&lt;Interface&gt;&gt;&#xa;ICommand" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="220" y="90" width="160" height="110" as="geometry">
+            <mxRectangle x="220" y="120" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zkfFHV4jXpPFQw0GAbJ--1" value="&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="zkfFHV4jXpPFQw0GAbJ--0" vertex="1">
+          <mxGeometry y="50" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="zkfFHV4jXpPFQw0GAbJ--4" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" parent="zkfFHV4jXpPFQw0GAbJ--0" vertex="1">
+          <mxGeometry y="76" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="zkfFHV4jXpPFQw0GAbJ--5" value="+Execute(string): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="zkfFHV4jXpPFQw0GAbJ--0" vertex="1">
+          <mxGeometry y="84" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-6" value="&lt;i&gt;AbstractCommand&lt;/i&gt;" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="230" y="270" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-8" value="-commandCount: int&lt;div&gt;#commandState: string&lt;/div&gt;&lt;div&gt;+commandName: string&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="Znvhm30pEqw09myKIBPT-6">
+          <mxGeometry y="20" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-9" value="-CommandBuilder(): void" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="Znvhm30pEqw09myKIBPT-6">
+          <mxGeometry y="90" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-10" value="" style="endArrow=none;dashed=1;html=1;rounded=0;entryX=0.492;entryY=1.108;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Znvhm30pEqw09myKIBPT-6" target="zkfFHV4jXpPFQw0GAbJ--5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="270" y="320" as="sourcePoint" />
+            <mxPoint x="320" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-11" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.488;entryY=1.015;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" target="zkfFHV4jXpPFQw0GAbJ--5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="298" y="210" as="sourcePoint" />
+            <mxPoint x="320" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-12" value="CommandStepBuilder" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="490" y="460" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-13" value="+MAXSTEPS: 10&lt;div&gt;+&lt;u&gt;StepCount&lt;/u&gt;: int&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="Znvhm30pEqw09myKIBPT-12">
+          <mxGeometry y="25" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-14" value="ConcreteCommand" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="184" y="460" width="230" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-16" value="#commandBuilder: CommandStepBuilder" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="Znvhm30pEqw09myKIBPT-14">
+          <mxGeometry y="25" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-19" value="+Execute(string): void" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="Znvhm30pEqw09myKIBPT-14">
+          <mxGeometry y="85" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Znvhm30pEqw09myKIBPT-15" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Znvhm30pEqw09myKIBPT-14" target="Znvhm30pEqw09myKIBPT-9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="270" y="440" as="sourcePoint" />
+            <mxPoint x="320" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

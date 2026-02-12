@@ -5,6 +5,9 @@ debug/
 *.pth
 *.pt
 
+bin/
+obj/
+
 "Neural Networks: Theory and Practice"/*
 !"Neural Networks: Theory and Practice"/*Assignment*
 
